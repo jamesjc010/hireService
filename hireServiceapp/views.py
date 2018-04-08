@@ -11,7 +11,23 @@ def home(request):
 
 @login_required(login_url='/seller/sign-in/')
 def seller_home(request):
-    return render(request, 'seller/home.html', {})
+    return redirect(seller_order)
+
+@login_required(login_url='/seller/sign-in/')
+def seller_account(request):
+    return render(request, 'seller/account.html', {})
+
+@login_required(login_url='/seller/sign-in/')
+def seller_item(request):
+    return render(request, 'seller/item.html', {})
+
+@login_required(login_url='/seller/sign-in/')
+def seller_order(request):
+    return render(request, 'seller/order.html', {})
+
+@login_required(login_url='/seller/sign-in/')
+def seller_report(request):
+    return render(request, 'seller/report.html', {})
 
 def seller_sign_up(request):
     user_form = UserForm()
