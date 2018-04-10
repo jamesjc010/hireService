@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from hireServiceapp.forms import UserForm, SellerForm
+from hireServiceapp.forms import UserForm, SellerForm, UserFormForEdit
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 
@@ -15,11 +15,32 @@ def seller_home(request):
 
 @login_required(login_url='/seller/sign-in/')
 def seller_account(request):
-    return render(request, 'seller/account.html', {})
+    user_form = UserFormForEdit(instance = request.user)
+    seller_form = SellerForm(instance = request.user.seller)
+
+    if request.method == "POST":
+        user_form = UserFormForEdit(request.POST, instance = request.user)
+        seller_form = SellerForm(request.POST, request.FILES, instance = request.user.seller)
+
+        if user_form.is_valid() and seller_form.is_valid():
+            user_form.save()
+            seller_form.save()
+
+    if request.user.seller.image:
+        seller_form.fields['image'].required = False
+
+    return render(request, 'seller/account.html', {
+        "user_form": user_form,
+        "seller_form": seller_form,
+    })
 
 @login_required(login_url='/seller/sign-in/')
 def seller_item(request):
     return render(request, 'seller/item.html', {})
+
+@login_required(login_url='/seller/sign-in/')
+def seller_add_item(request):
+    return render(request, 'seller/add_item.html', {})
 
 @login_required(login_url='/seller/sign-in/')
 def seller_order(request):

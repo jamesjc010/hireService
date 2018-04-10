@@ -30,3 +30,15 @@ class Driver(models.Model):
 
     def __str__(self):
         return self.user.get_full_name()
+
+class Item(models.Model):
+    #This foreignkey means the seller of the item is only this person
+    seller = models.ForeignKey(Seller)
+    name = models.CharField(max_length=500)
+    short_description = models.CharField(max_length=500)
+    image = models.ImageField(upload_to='item_images/', blank=False)
+    price = models.IntegerField(default=0)
+
+    #by default return image name
+    def __str__(self):
+        return self.name

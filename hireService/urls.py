@@ -38,6 +38,7 @@ urlpatterns = [
 
     url(r'^seller/account/$', views.seller_account, name = 'seller-account'),
     url(r'^seller/item/$', views.seller_item, name = 'seller-item'),
+    url(r'^seller/item/add/$', views.seller_add_item, name = 'seller-add-item'),
     url(r'^seller/order/$', views.seller_order, name = 'seller-order'),
     url(r'^seller/report/$', views.seller_report, name = 'seller-report'),
 
