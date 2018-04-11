@@ -1,6 +1,46 @@
 {% extends 'seller/base.html' %}
 
 {% block page %}
-  Items Page
-  <a href="{% url 'seller-add-item' %}" class="btn btn-pink">Add Meal</a>
+
+  <div class="panel">
+      <div class="panel-heading bg-blue">
+          <h4 class="panel-title text-center text-white">Items</h4>
+      </div>
+      <div class="panel-body">
+          <div class="text-right">
+              <a href="{% url 'seller-add-item' %}" class="btn btn-pink">Add Items</a>
+              </br>
+              </br>
+          </div>
+
+          <table class="table table-bordered table-hover table-striped">
+              <thead>
+                  <tr class="bg-gray text-white">
+                      <th>Id</th>
+                      <th>Name</th>
+                      <th>Short Description</th>
+                      <th>Price</th>
+                      <th class="text-center">Image</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for item in items %}
+                      <tr>
+                          <td scope="row">{{ item.id }}</td>
+                          <td><a href="{% url 'seller-edit-item' item.id %}">{{ item.name }}</a></td>
+                          <td>{{ item.short_description }}</td>
+                          <td>{{ item.price }}</td>
+                          <td class="text-center"><img class="img-rounded"
+                              src="{{ MEDIA_URL }}{{ item.image }}" width="50" height="50"></td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+
+      </div>
+  </div>
+
+
+
+
 {% endblock %}

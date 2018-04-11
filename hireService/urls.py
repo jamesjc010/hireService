@@ -15,11 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from hireServiceapp import views
 from django.contrib.auth import views as auth_views
-
 from django.conf.urls.static import static
 from django.conf import settings
+
+from hireServiceapp import views, apis
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^seller/account/$', views.seller_account, name = 'seller-account'),
     url(r'^seller/item/$', views.seller_item, name = 'seller-item'),
     url(r'^seller/item/add/$', views.seller_add_item, name = 'seller-add-item'),
+    url(r'^seller/item/edit/(?P<item_id>\d+)/$', views.seller_edit_item, name = 'seller-edit-item'),
     url(r'^seller/order/$', views.seller_order, name = 'seller-order'),
     url(r'^seller/report/$', views.seller_report, name = 'seller-report'),
 
@@ -46,4 +47,7 @@ urlpatterns = [
     url(r'^api/social/', include('rest_framework_social_oauth2.urls')),
     # /convert-token (sign-in/ sign_up)
     # /revoke-token (sign-out)
+
+    #when someone calls this url it calls the customer_get_sellers function
+    url(r'^api/customer/sellers/$', apis.customer_get_sellers),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

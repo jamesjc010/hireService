@@ -1,7 +1,7 @@
 from django import forms
 
 from django.contrib.auth.models import User
-from hireServiceapp.models import Seller
+from hireServiceapp.models import Seller, Item
 
 class UserForm(forms.ModelForm):
     email = forms.CharField(max_length=100, required=True)
@@ -23,3 +23,8 @@ class SellerForm(forms.ModelForm):
     class Meta:
         model = Seller
         fields = ("name", "phone", "address", "image")
+
+class ItemForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        exclude = ("seller",)

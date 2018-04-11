@@ -8,6 +8,10 @@ body {
   background-color: #3f3f63;
 }
 
+.bg-gray {
+  background-color: #88A1B2;
+}
+
 .text-white {
   color: white;
 }
@@ -70,8 +74,8 @@ body {
 .sidebar .list-group .list-group-item:focus {
   background-color: #3F3F63;
   color: #b6b4c1;
-  border: 0;
-  padding-left: 16px;
+  border: 1;
+  padding-left: 60px;
   padding-right: 30px;
 }
 
@@ -108,4 +112,14 @@ body {
 
 .content .panel {
   border: none;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.table,
+.table > thead > tr > th {
+  border-color: #88A1B2;
 }

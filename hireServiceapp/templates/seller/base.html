@@ -3,6 +3,12 @@
 {% block title %} Seller {% endblock %}
 
 {% block sidebar %}
+
+  {% url 'seller-order' as seller_order_url %}
+  {% url 'seller-item' as seller_item_url %}
+  {% url 'seller-report' as seller_report_url %}
+  {% url 'seller-account' as seller_account_url %}
+
   <div class="text-center">
     <img class="img-circle" src="{{ MEDIA_URL }}{{ request.user.seller.image }}"
         width="70" height="70">
@@ -14,13 +20,17 @@
 
   <div class="list-group">
     <span class="text-uppercase">Dashboard</span>
-    
-    <a href="{% url 'seller-order' %}" class="list-group-item">Orders</a>
-    <a href="{% url 'seller-item' %}" class="list-group-item">Items</a>
-    <a href="{% url 'seller-report' %}" class="list-group-item">Reports</a>
+
+    <a href="{% url 'seller-order' %}"
+        class="list-group-item {% if request.path == seller_order_url %} active {% endif %}">Orders</a>
+    <a href="{% url 'seller-item' %}"
+        class="list-group-item {% if request.path == seller_item_url %} active {% endif %}">Items</a>
+    <a href="{% url 'seller-report' %}"
+        class="list-group-item {% if request.path == seller_report_url %} active {% endif %}">Reports</a>
 
     <span class="text-uppercase">Profile</span>
-    <a href="{% url 'seller-account' %}" class="list-group-item">Account</a>
+    <a href="{% url 'seller-account' %}"
+        class="list-group-item {% if request.path == seller_account_url %} active {% endif %}">Account</a>
   </div>
 
   <div class="text-centre">
