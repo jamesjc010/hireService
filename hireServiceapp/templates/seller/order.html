@@ -17,6 +17,7 @@
                         <th>Customer</th>
                         <th>Driver</th>
                         <th>Total</th>
+                        <th>Total Size</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -34,6 +35,7 @@
                             <td>{{ order.customer }}</td>
                             <td>{{ order.driver }}</td>
                             <td>{{ order.total }}</td>
+                            <td>{{ order.total_size }}</td>
                             <td>{{ order.get_status_display }}</td>
                             <td>
                                 {% if order.status == 1 %}

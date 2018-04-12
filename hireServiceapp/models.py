@@ -28,6 +28,9 @@ class Driver(models.Model):
     avatar = models.CharField(max_length=500)
     phone = models.CharField(max_length=500, blank=True)
     address = models.CharField(max_length=500, blank=True)
+    capacity = models.IntegerField(default=0)
+    total_capacity = models.IntegerField(default=0)
+    #availability =
 
     def __str__(self):
         return self.user.get_full_name()
@@ -39,6 +42,7 @@ class Item(models.Model):
     short_description = models.CharField(max_length=500)
     image = models.ImageField(upload_to='item_images/', blank=False)
     price = models.IntegerField(default=0)
+    size = models.IntegerField(default=0)
 
     #by default return image name
     def __str__(self):
@@ -59,11 +63,13 @@ class Order(models.Model):
 
     customer = models.ForeignKey(Customer)
     seller = models.ForeignKey(Seller)
-    driver = models.ForeignKey(Driver)
+    # Driver is blank when order is created
+    driver = models.ForeignKey(Driver, blank = True, null = True)
     address = models.CharField(max_length=500)
     total = models.IntegerField()
+    total_size = models.IntegerField(default=0)
     status = models.IntegerField(choices = STATUS_CHOICES)
-    create_at = models.DateTimeField(default = timezone.now)
+    created_at = models.DateTimeField(default = timezone.now)
     picked_at = models.DateTimeField(blank = True, null = True)
 
     def __str__(self):
