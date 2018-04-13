@@ -30,6 +30,7 @@ class Driver(models.Model):
     address = models.CharField(max_length=500, blank=True)
     capacity = models.IntegerField(default=0)
     total_capacity = models.IntegerField(default=0)
+    location = models.CharField(max_length=500, blank=True)
     #availability =
 
     def __str__(self):
@@ -71,6 +72,11 @@ class Order(models.Model):
     status = models.IntegerField(choices = STATUS_CHOICES)
     created_at = models.DateTimeField(default = timezone.now)
     picked_at = models.DateTimeField(blank = True, null = True)
+    #delivered_at =
+    #
+    #on_board_at =
+    #pick_up_by =
+    #deliver_by =
 
     def __str__(self):
         return str(self.id)

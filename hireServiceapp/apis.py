@@ -6,8 +6,15 @@ from django.views.decorators.csrf import csrf_exempt
 
 from oauth2_provider.models import AccessToken
 
-from hireServiceapp.models import Seller, Item, Order, OrderDetails
-from hireServiceapp.serializers import SellerSerializer, ItemSerializer, OrderSerializer
+from hireServiceapp.models import Seller, Item, Order, OrderDetails, Driver
+from hireServiceapp.serializers import SellerSerializer, \
+    ItemSerializer, \
+    OrderSerializer
+
+import stripe
+from hireService.settings import STRIPE_API_KEY
+
+stripe.api_key = STRIPE_API_KEY
 
 ##############
 # CUSTOMER
@@ -61,6 +68,9 @@ def customer_add_order(request):
         ## can get customer from user in access_token (as you see in django dashboard)
         customer = access_token.user.customer
 
+        # Get Stripe token (from params)
+        stripe_token = request.POST["stripe_token"]
+
         # Check whether customer has any order that is not delivered
         # current order must be completed before new order can be placed
         if Order.objects.filter(customer = customer).exclude(status = Order.DELIVERED):
@@ -87,26 +97,39 @@ def customer_add_order(request):
 
         ## if length of order details (i.e. how many order_details) is greater than zero
         if len(order_details) > 0:
-            # Step 1 - Create Order
-            order = Order.objects.create(
-                customer = customer,
-                seller_id = request.POST["seller_id"],
-                total = order_total,
-                total_size = total_size,
-                status = Order.PREPARING,
-                address = request.POST["address"]
+
+            # Step 1 - Create a charge: this will charge customer's card
+            charge = stripe.Charge.create(
+                amount = order_total*100, # Amount in cents
+                currency = "usd",
+                source = stripe_token,
+                description = "HireService Order"
             )
 
-            # Step 2 - Create Order Details
-            for item in order_details:
-                OrderDetails.objects.create(
-                    order = order,
-                    item_id = item["item_id"],
-                    quantity = item["quantity"],
-                    sub_total = Item.objects.get(id = item["item_id"]).price * item["quantity"]
+            if charge.status != "failed":
+                # Step 2 - Create Order
+                order = Order.objects.create(
+                    customer = customer,
+                    seller_id = request.POST["seller_id"],
+                    total = order_total,
+                    total_size = total_size,
+                    status = Order.PREPARING,
+                    address = request.POST["address"]
                 )
 
-            return JsonResponse({"status": "success"})
+                # Step 3 - Create Order Details
+                for item in order_details:
+                    OrderDetails.objects.create(
+                        order = order,
+                        item_id = item["item_id"],
+                        quantity = item["quantity"],
+                        sub_total = Item.objects.get(id = item["item_id"]).price * item["quantity"]
+                    )
+
+                return JsonResponse({"status": "success"})
+            else:
+                return JsonResponse({"status": "failed", "error": "Fail connect to Stripe."})
+
 
 
 def customer_get_latest_order(request):
@@ -119,6 +142,22 @@ def customer_get_latest_order(request):
 
     return JsonResponse({"order": order})
 
+
+def customer_driver_location(request):
+    access_token = AccessToken.objects.get(token = request.GET.get("access_token"),
+        expires__gt = timezone.now())
+
+    customer = access_token.user.customer
+
+    #Get Driver's location related to this customer's current order
+    current_order = Order.objects.filter(customer = customer, status = Order.ONTHEWAY).last()
+    location = current_order.driver.location
+
+    return JsonResponse({"location": location})
+
+
+
+
 ##############
 # SELLER
 ##############
@@ -130,6 +169,9 @@ def seller_order_notification(request, last_request_time):
     #where seller = request.user.seller AND created_at > last_request_time
 
     return JsonResponse({"notification": notification})
+
+
+
 
 ##############
 # DRIVER
@@ -253,3 +295,21 @@ def driver_get_revenue(request):
         revenue[day.strftime("%a")] = sum(order.total for order in orders)
 
     return JsonResponse({"revenue": revenue})
+
+# POST
+# params: access_token, "lat,lng" - this is a string
+@csrf_exempt
+def driver_update_location(request):
+    if request.method=="POST":
+        # Get token
+        access_token = AccessToken.objects.get(token = request.POST.get("access_token"),
+            expires__gt = timezone.now())
+
+        # Get driver
+        driver = access_token.user.driver
+
+        # Set location String (to the) => database
+        driver.location = request.POST["location"]
+        driver.save()
+
+        return JsonResponse({"status": "success"})

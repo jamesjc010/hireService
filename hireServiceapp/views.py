@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 from hireServiceapp.forms import UserForm, SellerForm, UserFormForEdit, ItemForm
 from django.contrib.auth import authenticate, login
 
 from django.contrib.auth.models import User
-from hireServiceapp.models import Item, Order
+from hireServiceapp.models import Item, Order, Driver
 
+from django.db.models import Sum, Count, Case, When
 
 # Create your views here. i.e. functions
 def home(request):
@@ -91,7 +93,54 @@ def seller_order(request):
 
 @login_required(login_url='/seller/sign-in/')
 def seller_report(request):
-    return render(request, 'seller/report.html', {})
+    # Calulate revenue and number of order by current week
+    from datetime import datetime, timedelta
+
+
+    revenue = []
+    orders = []
+
+    # Calculate Weekdays
+    today = timezone.now()
+    #weekday function returns integer representing a weekday
+    #i.e monday is 0, sunday is 6
+    current_weekdays = [today + timedelta(days = i) for i in range (0 - today.weekday(), 7 - today.weekday())]
+
+    #for every day in week, get delivered orders, calculate total revenue
+    #and total amount of order for each day and append to array
+    for day in current_weekdays:
+        delivered_orders = Order.objects.filter(
+            seller = request.user.seller,
+            status = Order.DELIVERED,
+            created_at__year = day.year,
+            created_at__month = day.month,
+            created_at__day = day.day,
+        )
+        revenue.append(sum(order.total for order in delivered_orders))
+        orders.append(delivered_orders.count())
+
+    # Top 3 DRIVERS
+    # This calculates total amount of orders per each driver and orders them and gets top 3 [:3]
+    top3_drivers = Driver.objects.annotate(
+        total_order = Count(
+            Case (
+                When(order__seller = request.user.seller, then = 1)
+            )
+        )
+    ).order_by("-total_order")[:3]
+
+    #Gets driver details from top3_drivers in for loop
+    driver = {
+        "labels": [driver.user.get_full_name() for driver in top3_drivers],
+        "data": [driver.total_order for driver in top3_drivers]
+    }
+
+    # Return
+    return render(request, 'seller/report.html', {
+        "revenue": revenue,
+        "orders": orders,
+        "driver" : driver
+    })
 
 def seller_sign_up(request):
     user_form = UserForm()

@@ -56,6 +56,7 @@ urlpatterns = [
     url(r'^api/customer/items/(?P<seller_id>\d+)/$', apis.customer_get_items),
     url(r'^api/customer/order/add/$', apis.customer_add_order),
     url(r'^api/customer/order/latest/$', apis.customer_get_latest_order),
+    url(r'^api/customer/driver/location/$', apis.customer_driver_location),
 
     # APIs for DRIVERS
     url(r'^api/driver/orders/ready/$', apis.driver_get_ready_orders),
@@ -63,5 +64,6 @@ urlpatterns = [
     url(r'^api/driver/orders/latest/$', apis.driver_get_latest_order),
     url(r'^api/driver/orders/complete/$', apis.driver_complete_order),
     url(r'^api/driver/revenue/$', apis.driver_get_revenue),
+    url(r'^api/driver/location/update/$', apis.driver_update_location),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
