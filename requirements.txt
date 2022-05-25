@@ -16,7 +16,7 @@ django-oauth-toolkit==0.10.0
 djangorestframework==3.4.3
 idna==2.6
 oauthlib==1.0.3
-PyJWT==1.6.1
+PyJWT==2.4.0
 python3-openid==3.1.0
 pytz==2016.6.1
 requests==2.18.4
