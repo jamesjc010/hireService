@@ -9,7 +9,7 @@ django-bootstrap3==7.0.1
 stripe==1.37.0
 python-social-auth==0.2.21
 django-braces==1.12.0
-certifi==2018.1.18
+certifi==2022.12.7
 chardet==3.0.4
 defusedxml==0.5.0
 django-oauth-toolkit==0.10.0
